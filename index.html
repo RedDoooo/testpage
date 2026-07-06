@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人主页 | 极简科技风</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["'Inter'", "sans-serif"],
+          },
+          colors: {
+            apple: {
+              bg: "#F5F5F7",
+              card: "#FFFFFF",
+              text: "#1D1D1F",
+              sub: "#86868B",
+            },
+            mars: {
+              DEFAULT: "#005C99",
+              light: "#0088E5",
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- 自定义 CSS -->
+  <style>
+    body {
+      background-color: #F5F5F7;
+      color: #1D1D1F;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(0, 92, 153, 0.2); }
+
+    /* --- 苹果风浅色磨砂玻璃 --- */
+    .apple-glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+    }
+
+    /* --- 玛尔斯蓝动态水波纹按钮 --- */
+    .mars-ripple-btn {
+      position: relative;
+      background: #005C99;
+      color: white;
+      overflow: hidden;
+      border: none;
+      z-index: 1;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .mars-ripple-btn:hover {
+      box-shadow: 0 8px 24px rgba(0, 92, 153, 0.4);
+      transform: translateY(-1px);
+    }
+    .mars-ripple-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+      animation: rippleAnim 4s infinite linear;
+      z-index: -1;
+    }
+    @keyframes rippleAnim {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    /* --- 卡片悬浮玛尔斯蓝光晕 --- */
+    .hover-mars-glass {
+      position: relative;
+      background: #FFFFFF;
+      overflow: hidden;
+    }
+    .hover-mars-glass::after {
+      content: '';
+      position: absolute;
+      bottom: -50px; right: -50px;
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, rgba(0, 92, 153, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .hover-mars-glass:hover::after {
+      opacity: 1;
+      transform: scale(2.5);
+      animation: pulseRipple 3s infinite alternate;
+    }
+    @keyframes pulseRipple {
+      0% { transform: scale(2.5); opacity: 0.8; }
+      100% { transform: scale(2.8); opacity: 0.3; }
+    }
+
+    /* --- 视频透明遮罩 --- */
+    .mask-v-fade {
+      -webkit-mask-image: linear-gradient(to bottom, transparent, black 150px, black calc(100% - 150px), transparent);
+      mask-image: linear-gradient(to bottom, transparent, black 150px, black calc(100% - 150px), transparent);
+    }
+
+    /* --- 白色科技感网格背景 --- */
+    .tech-grid-bg {
+      background-image: 
+        linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at center, black, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+    }
+
+    /* --- 动画类 --- */
+    .blur-word {
+      display: inline-block;
+      filter: blur(10px);
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+      transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                  filter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                  transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      margin-right: 0.25em;
+    }
+    /* 修复了这里：使用 blur-text-container 进行匹配 */
+    .blur-text-container.is-visible .blur-word {
+      filter: blur(0px);
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .fade-up.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 修复锚点跳转遮挡 */
+    section { scroll-margin-top: 100px; }
+  </style>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="font-sans">
+
+  <!-- SECTION 1 — 导航栏 -->
+  <nav class="fixed top-4 left-0 right-0 z-50 px-6 md:px-16 flex items-center justify-between pointer-events-none">
+    
+    <!-- Logo & Language Toggle -->
+    <div class="flex-1 flex items-center gap-4 pointer-events-auto">
+      <div class="w-10 h-10 rounded-full overflow-hidden bg-apple-card shadow-sm flex items-center justify-center border border-gray-200 cursor-pointer" onclick="window.scrollTo(0,0)">
+        <span class="font-bold text-apple-text tracking-tighter">ME.</span>
+      </div>
+      <!-- 语言切换器 -->
+      <div class="apple-glass rounded-full px-3 py-1 flex items-center gap-2 text-xs font-medium cursor-pointer" onclick="toggleLanguage()">
+        <span id="lang-en" class="text-apple-sub transition-colors">EN</span>
+        <span class="text-gray-300">/</span>
+        <span id="lang-zh" class="text-mars transition-colors">中</span>
+      </div>
+    </div>
+
+    <!-- 主导航 -->
+    <div class="flex-1 hidden lg:flex justify-center pointer-events-auto">
+      <div class="apple-glass rounded-full flex items-center p-1.5 pl-6 gap-6 shadow-sm">
+        <div class="flex items-center gap-6 text-[13px] font-medium text-apple-sub">
+          <a href="#about" data-i18n="nav_about" class="hover:text-mars transition-colors">关于</a>
+          <a href="#experience" data-i18n="nav_exp" class="hover:text-mars transition-colors">经历</a>
+          <a href="#works" data-i18n="nav_works" class="hover:text-mars transition-colors">作品</a>
+          <a href="#stack" data-i18n="nav_stack" class="hover:text-mars transition-colors">技术栈</a>
+        </div>
+        <a href="#contact" class="mars-ripple-btn rounded-full px-5 py-2 text-[13px] font-medium flex items-center gap-1.5">
+          <span data-i18n="nav_contact">联系我</span>
+          <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="flex-1"></div>
+  </nav>
+
+  <!-- SECTION 2 — 首屏 HERO区 (About) -->
+  <section id="about" class="relative h-[100vh] min-h-[800px] w-full flex flex-col items-center justify-center overflow-hidden bg-apple-bg">
+    <!-- 科技感白色视频背景 -->
+    <video class="absolute top-0 w-full h-full object-cover z-0 opacity-40 mix-blend-darken"
+      src="https://cdn.pixabay.com/video/2020/07/22/45347-442750694_tiny.mp4" autoplay loop muted playsinline></video>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-apple-bg z-[1] pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col items-center px-6 text-center max-w-4xl w-full">
+      <div class="apple-glass rounded-full px-2 py-1.5 pr-4 text-xs font-medium text-apple-sub inline-flex items-center gap-3 mb-8 fade-up shadow-sm">
+        <span class="mars-ripple-btn px-2.5 py-1 rounded-full text-[11px] shadow-none" data-i18n="hero_badge_tag">求职中</span>
+        <span class="tracking-wide text-apple-text" data-i18n="hero_badge_text">欢迎来到我的数字空间</span>
+      </div>
+
+      <!-- 修复后的动态模糊文字容器 -->
+      <h1 class="blur-text-container text-6xl md:text-7xl lg:text-[6.5rem] font-bold text-apple-text leading-[1.05] tracking-tight mb-6" data-delay="100" data-i18n-html="hero_title">
+        <!-- JS 渲染区：保留 Design. Code. Create. -->
+      </h1>
+
+      <p class="fade-up font-normal text-apple-sub text-lg md:text-xl max-w-2xl mb-10 leading-relaxed" style="transition-delay: 600ms;" data-i18n="hero_desc">
+        我是一名全栈开发者与产品设计师。致力于用极简的代码和优雅的设计，构建令人惊叹的现代数字体验。
+      </p>
+
+      <div class="fade-up flex flex-col sm:flex-row items-center gap-4" style="transition-delay: 900ms;">
+        <a href="#works" class="mars-ripple-btn rounded-full px-7 py-3.5 text-sm font-medium flex items-center gap-2">
+          <span data-i18n="hero_btn_works">浏览作品</span>
+          <i data-lucide="arrow-down" class="w-4 h-4 text-white"></i>
+        </a>
+        <a href="#" class="apple-glass rounded-full px-7 py-3.5 text-sm font-medium text-apple-text flex items-center gap-2 hover:bg-gray-100 transition-colors">
+          <i data-lucide="download" class="w-4 h-4 text-apple-text"></i>
+          <span data-i18n="hero_btn_resume">下载简历</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 — 经历 (Experience) -->
+  <section id="experience" class="py-24 px-6 md:px-16 lg:px-24 max-w-6xl mx-auto w-full">
+    <div class="text-center mb-16 fade-up">
+      <div class="text-xs font-semibold text-mars uppercase tracking-widest inline-block mb-4" data-i18n="exp_tag">Experience</div>
+      <h2 class="text-4xl md:text-5xl font-bold text-apple-text tracking-tight" data-i18n="exp_title">职业轨迹</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 fade-up">
+      <div class="apple-glass rounded-3xl p-8 flex flex-col justify-between gap-6 hover:shadow-lg transition-shadow">
+        <div>
+          <p class="text-sm font-semibold text-mars mb-2">2022 - Present</p>
+          <h3 class="text-2xl font-bold text-apple-text mb-1" data-i18n="exp_1_role">高级前端工程师 @ 字节跳动</h3>
+          <p class="text-apple-sub text-sm leading-relaxed" data-i18n="exp_1_desc">负责核心商业化数据中台的前端架构。主导了微前端改造方案，页面加载速度提升 40%，打造了丝滑的跨应用交互体验。</p>
+        </div>
+      </div>
+      <div class="apple-glass rounded-3xl p-8 flex flex-col justify-between gap-6 hover:shadow-lg transition-shadow">
+        <div>
+          <p class="text-sm font-semibold text-mars mb-2">2019 - 2022</p>
+          <h3 class="text-2xl font-bold text-apple-text mb-1" data-i18n="exp_2_role">全栈开发工程师 @ 创新工场</h3>
+          <p class="text-apple-sub text-sm leading-relaxed" data-i18n="exp_2_desc">从 0 到 1 参与多个孵化项目的研发。使用 React 和 Node.js 构建全栈应用，兼顾后端 API 设计与前端 UI 动效还原。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 — 项目作品 (Works) -->
+  <section id="works" class="relative py-24 px-6 md:px-16 lg:px-24 w-full bg-apple-card overflow-hidden">
+    <div class="absolute inset-0 z-0 tech-grid-bg opacity-30"></div>
+    <div class="relative z-10 max-w-7xl mx-auto">
+      <div class="text-center mb-20 fade-up">
+        <div class="text-xs font-semibold text-mars uppercase tracking-widest inline-block mb-4" data-i18n="works_tag">Featured Works</div>
+        <h2 class="text-4xl md:text-5xl font-bold text-apple-text tracking-tight" data-i18n="works_title">近期精选项目</h2>
+      </div>
+
+      <div class="flex flex-col gap-24">
+        <!-- 项目 1 -->
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 fade-up">
+          <div class="flex-1 space-y-6">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-mars"></span>
+              <span class="text-sm font-medium text-apple-sub">Web Application</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold text-apple-text tracking-tight" data-i18n="works_1_name">金融级数据看板系统</h3>
+            <p class="text-apple-sub text-base max-w-md leading-relaxed" data-i18n="works_1_desc">
+              采用 React + D3.js 打造的高性能数据可视化平台。毫秒级渲染海量数据，提供丝滑如苹果原生的交互体验。
+            </p>
+            <button class="mars-ripple-btn rounded-full px-6 py-2.5 text-sm font-medium mt-2" data-i18n="btn_details">查看详情</button>
+          </div>
+          <div class="flex-1 w-full">
+            <div class="bg-gray-50 rounded-3xl p-3 shadow-xl border border-gray-100 transform transition hover:-translate-y-2 duration-500">
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Work 1" class="w-full h-full object-cover rounded-[1.25rem] opacity-90">
+            </div>
+          </div>
+        </div>
+
+        <!-- 项目 2 -->
+        <div class="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-20 fade-up">
+          <div class="flex-1 space-y-6">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-mars"></span>
+              <span class="text-sm font-medium text-apple-sub">Mobile Design</span>
+            </div>
+            <h3 class="text-3xl md:text-4xl font-bold text-apple-text tracking-tight" data-i18n="works_2_name">极简生活方式 App</h3>
+            <p class="text-apple-sub text-base max-w-md leading-relaxed" data-i18n="works_2_desc">
+              从 0 到 1 负责产品原型与前端开发。融入了细腻的流体动效与手势交互，让用户的每一次滑动都充满愉悦感。
+            </p>
+            <button class="text-mars font-medium mt-2 flex items-center gap-2 hover:text-mars-light transition-colors text-sm">
+              <span data-i18n="btn_case">浏览案例</span> <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="flex-1 w-full">
+            <div class="bg-gray-50 rounded-3xl p-3 shadow-xl border border-gray-100 transform transition hover:-translate-y-2 duration-500">
+              <img src="https://images.unsplash.com/photo-1616469829581-73993eb86b02?auto=format&fit=crop&w=800&q=80" alt="Work 2" class="w-full h-full object-cover rounded-[1.25rem] opacity-90">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 — 技术栈与能力 (Stack) -->
+  <section id="stack" class="py-24 px-6 md:px-16 lg:px-24 max-w-7xl mx-auto w-full">
+    <div class="text-center mb-16 fade-up">
+      <div class="text-xs font-semibold text-mars uppercase tracking-widest inline-block mb-4" data-i18n="stack_tag">Stack & Expertise</div>
+      <h2 class="text-4xl md:text-5xl font-bold text-apple-text tracking-tight" data-i18n="stack_title">技术与核心能力</h2>
+    </div>
+
+    <div class="flex flex-wrap justify-center items-center gap-6 md:gap-10 mb-16 opacity-80 font-bold text-lg text-apple-sub fade-up">
+      <span class="hover:text-mars transition-colors">React / Next.js</span>
+      <span class="hover:text-mars transition-colors">TypeScript</span>
+      <span class="hover:text-mars transition-colors">Node.js</span>
+      <span class="hover:text-mars transition-colors">TailwindCSS</span>
+      <span class="hover:text-mars transition-colors">Figma</span>
+      <span class="hover:text-mars transition-colors">GraphQL</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 fade-up">
+      <div class="hover-mars-glass border border-gray-200 rounded-3xl p-8 flex flex-col gap-6 shadow-sm">
+        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-mars"><i data-lucide="code-2" class="w-6 h-6"></i></div>
+        <div>
+          <h4 class="text-lg font-bold text-apple-text mb-2 tracking-tight" data-i18n="skill_1_title">像素级还原</h4>
+          <p class="text-apple-sub font-normal text-sm leading-relaxed" data-i18n="skill_1_desc">不仅仅是写代码，更是完美还原设计稿中的每一个呼吸感细节。</p>
+        </div>
+      </div>
+      <div class="hover-mars-glass border border-gray-200 rounded-3xl p-8 flex flex-col gap-6 shadow-sm">
+        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-mars"><i data-lucide="zap" class="w-6 h-6"></i></div>
+        <div>
+          <h4 class="text-lg font-bold text-apple-text mb-2 tracking-tight" data-i18n="skill_2_title">极致性能</h4>
+          <p class="text-apple-sub font-normal text-sm leading-relaxed" data-i18n="skill_2_desc">深谙前端性能优化，Lighthouse 满分只是基础，流畅体验才是目标。</p>
+        </div>
+      </div>
+      <div class="hover-mars-glass border border-gray-200 rounded-3xl p-8 flex flex-col gap-6 shadow-sm">
+        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-mars"><i data-lucide="smartphone" class="w-6 h-6"></i></div>
+        <div>
+          <h4 class="text-lg font-bold text-apple-text mb-2 tracking-tight" data-i18n="skill_3_title">全端响应式</h4>
+          <p class="text-apple-sub font-normal text-sm leading-relaxed" data-i18n="skill_3_desc">从 4K 显示器到手机屏幕，确保产品在任何设备上都展现完美比例。</p>
+        </div>
+      </div>
+      <div class="hover-mars-glass border border-gray-200 rounded-3xl p-8 flex flex-col gap-6 shadow-sm">
+        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-mars"><i data-lucide="lightbulb" class="w-6 h-6"></i></div>
+        <div>
+          <h4 class="text-lg font-bold text-apple-text mb-2 tracking-tight" data-i18n="skill_4_title">产品思维</h4>
+          <p class="text-apple-sub font-normal text-sm leading-relaxed" data-i18n="skill_4_desc">懂技术的交互设计师。站在用户角度写代码，为商业价值赋能。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6 — 呼吁行动 / 联系方式 (Contact) -->
+  <section id="contact" class="relative pt-32 pb-12 px-6 md:px-16 lg:px-24 flex flex-col items-center justify-center overflow-hidden w-full min-h-[700px] bg-white">
+    <video class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-multiply mask-v-fade" 
+           src="https://cdn.pixabay.com/video/2021/08/11/84687-587284699_tiny.mp4" autoplay loop muted playsinline></video>
+    
+    <div class="relative z-10 flex flex-col items-center text-center max-w-5xl mt-auto mb-auto fade-up">
+      <h2 class="text-6xl md:text-8xl lg:text-[6.5rem] font-bold text-apple-text tracking-tight leading-[1.05] mb-8" data-i18n-html="contact_title">
+        准备好启动你的 <br>下一个伟大的项目了吗？
+      </h2>
+      <p class="text-apple-sub text-lg md:text-xl mb-10 max-w-lg font-light" data-i18n="contact_desc">
+        无论是全新的 Web 应用，还是体验升级，我都随时准备为你提供帮助。
+      </p>
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <a href="mailto:hello@example.com" class="mars-ripple-btn rounded-full px-8 py-4 text-sm font-medium shadow-md">
+          <span data-i18n="contact_btn_email">给我发邮件</span>
+        </a>
+        <button class="apple-glass border border-gray-300 rounded-full px-8 py-4 text-sm font-medium text-apple-text hover:bg-gray-100 transition-colors">
+          <span data-i18n="contact_btn_call">预约线上交流</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="relative z-10 mt-32 pt-8 w-full max-w-7xl mx-auto border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 fade-up">
+      <p class="text-apple-sub text-xs font-medium tracking-wide">
+        © 2026 Developer Portfolio. All rights reserved.
+      </p>
+      <div class="flex items-center gap-6 text-apple-sub text-xs font-medium">
+        <a href="#" class="hover:text-mars transition-colors flex items-center gap-1"><i data-lucide="github" class="w-4 h-4"></i> GitHub</a>
+        <a href="#" class="hover:text-mars transition-colors flex items-center gap-1"><i data-lucide="twitter" class="w-4 h-4"></i> Twitter</a>
+        <a href="#" class="hover:text-mars transition-colors flex items-center gap-1"><i data-lucide="linkedin" class="w-4 h-4"></i> LinkedIn</a>
+      </div>
+    </footer>
+  </section>
+
+  <!-- 脚本控制 (交互与 i18n 语言系统) -->
+  <script>
+    lucide.createIcons();
+
+    // 翻译字典 (保留 Design. Code. 纯正感)
+    const i18nData = {
+      zh: {
+        nav_about: "关于", nav_exp: "经历", nav_works: "作品", nav_stack: "技术栈", nav_contact: "联系我",
+        hero_badge_tag: "求职中", hero_badge_text: "欢迎来到我的数字空间",
+        hero_title: "Design. Code. <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-mars to-mars-light'>Create.</span>",
+        hero_desc: "我是一名全栈开发者与产品设计师。致力于用极简的代码和优雅的设计，构建令人惊叹的现代数字体验。",
+        hero_btn_works: "浏览作品", hero_btn_resume: "下载简历",
+        exp_tag: "Experience", exp_title: "职业轨迹",
+        exp_1_role: "高级前端工程师 @ 字节跳动", exp_1_desc: "负责核心商业化数据中台的前端架构。主导了微前端改造方案，页面加载速度提升 40%，打造了丝滑的跨应用交互体验。",
+        exp_2_role: "全栈开发工程师 @ 创新工场", exp_2_desc: "从 0 到 1 参与多个孵化项目的研发。使用 React 和 Node.js 构建全栈应用，兼顾后端 API 设计与前端 UI 动效还原。",
+        works_tag: "Featured Works", works_title: "近期精选项目",
+        works_1_name: "金融级数据看板系统", works_1_desc: "采用 React + D3.js 打造的高性能数据可视化平台。毫秒级渲染海量数据，提供丝滑如苹果原生的交互体验。",
+        works_2_name: "极简生活方式 App", works_2_desc: "从 0 到 1 负责产品原型与前端开发。融入了细腻的流体动效与手势交互，让用户的每一次滑动都充满愉悦感。",
+        btn_details: "查看详情", btn_case: "浏览案例",
+        stack_tag: "Stack & Expertise", stack_title: "技术与核心能力",
+        skill_1_title: "像素级还原", skill_1_desc: "不仅仅是写代码，更是完美还原设计稿中的每一个呼吸感细节。",
+        skill_2_title: "极致性能", skill_2_desc: "深谙前端性能优化，Lighthouse 满分只是基础，流畅体验才是目标。",
+        skill_3_title: "全端响应式", skill_3_desc: "从 4K 显示器到手机屏幕，确保产品在任何设备上都展现完美比例。",
+        skill_4_title: "产品思维", skill_4_desc: "懂技术的交互设计师。站在用户角度写代码，为商业价值赋能。",
+        contact_title: "准备好启动你的 <br>下一个伟大的项目了吗？",
+        contact_desc: "无论是全新的 Web 应用，还是体验升级，我都随时准备为你提供帮助。",
+        contact_btn_email: "给我发邮件", contact_btn_call: "预约线上交流"
+      },
+      en: {
+        nav_about: "About", nav_exp: "Experience", nav_works: "Works", nav_stack: "Stack", nav_contact: "Contact",
+        hero_badge_tag: "Available", hero_badge_text: "Welcome to my digital space",
+        hero_title: "Design. Code. <br><span class='text-transparent bg-clip-text bg-gradient-to-r from-mars to-mars-light'>Create.</span>",
+        hero_desc: "I am a full-stack developer and product designer. Dedicated to building stunning modern digital experiences with minimalist code and elegant design.",
+        hero_btn_works: "View Works", hero_btn_resume: "Get Resume",
+        exp_tag: "Experience", exp_title: "Career Track",
+        exp_1_role: "Senior Frontend Eng @ ByteDance", exp_1_desc: "Led the frontend architecture for the core commercial data platform. Spearheaded the micro-frontend migration, boosting page load speed by 40% and delivering a silky-smooth cross-app experience.",
+        exp_2_role: "Full-Stack Dev @ Sinovation Ventures", exp_2_desc: "Participated in R&D for multiple incubated startups from 0 to 1. Built full-stack apps using React and Node.js, balancing backend API design with pixel-perfect frontend UI animations.",
+        works_tag: "Featured Works", works_title: "Recent Projects",
+        works_1_name: "Financial Data Dashboard", works_1_desc: "A high-performance data visualization platform built with React + D3.js. Renders massive datasets in milliseconds, providing a smooth, Apple-native-like interaction experience.",
+        works_2_name: "Minimalist Lifestyle App", works_2_desc: "Handled product prototyping and frontend development from scratch. Integrated delicate fluid animations and gesture interactions, making every swipe a joy for users.",
+        btn_details: "View Details", btn_case: "View Case Study",
+        stack_tag: "Stack & Expertise", stack_title: "Tech & Capabilities",
+        skill_1_title: "Pixel Perfect", skill_1_desc: "Not just writing code, but flawlessly recreating every breathing detail from the design mockups.",
+        skill_2_title: "Extreme Performance", skill_2_desc: "Expert in frontend optimization. A perfect Lighthouse score is just the baseline; a fluid experience is the goal.",
+        skill_3_title: "Fully Responsive", skill_3_desc: "From 4K monitors to mobile screens, ensuring the product displays in perfect proportions on any device.",
+        skill_4_title: "Product Mindset", skill_4_desc: "An interaction designer who codes. Writing logic from the user's perspective to empower business value.",
+        contact_title: "Ready to launch your <br>next great project?",
+        contact_desc: "Whether it's a brand new web app or an experience upgrade, I'm ready to help you.",
+        contact_btn_email: "Send an Email", contact_btn_call: "Book a Call"
+      }
+    };
+
+    let currentLang = 'zh';
+
+    // 模糊文字渲染
+    function renderBlurText(container, htmlString) {
+      container.innerHTML = '';
+      container.classList.remove('is-visible'); 
+      
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlString;
+      
+      let delayOffset = parseInt(container.getAttribute('data-delay') || '0');
+      let index = 0;
+
+      function processNodes(node, parent) {
+        node.childNodes.forEach(child => {
+          if (child.nodeType === 3) {
+            const words = child.textContent.split(/(\s+)/).filter(e => e.trim().length > 0);
+            words.forEach(word => {
+              const span = document.createElement('span');
+              span.innerText = word + ' ';
+              span.className = 'blur-word';
+              span.style.transitionDelay = `${delayOffset + (index * 60)}ms`;
+              parent.appendChild(span);
+              index++;
+            });
+          } else if (child.nodeType === 1) {
+            const newEl = child.cloneNode(false);
+            newEl.className += ' blur-word'; 
+            newEl.style.transitionDelay = `${delayOffset + (index * 60)}ms`;
+            processNodes(child, newEl);
+            parent.appendChild(newEl);
+            index++;
+          }
+        });
+      }
+      
+      processNodes(tempDiv, container);
+      
+      // 添加 is-visible 类触发 CSS 动画
+      setTimeout(() => { container.classList.add('is-visible'); }, 50);
+    }
+
+    // 语言切换
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      
+      document.getElementById('lang-en').className = currentLang === 'en' ? 'text-mars font-bold' : 'text-apple-sub';
+      document.getElementById('lang-zh').className = currentLang === 'zh' ? 'text-mars font-bold' : 'text-apple-sub';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18nData[currentLang][key]) {
+          el.innerText = i18nData[currentLang][key];
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (i18nData[currentLang][key]) {
+          if (el.classList.contains('blur-text-container')) {
+             renderBlurText(el, i18nData[currentLang][key]);
+          } else {
+             el.innerHTML = i18nData[currentLang][key];
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 初始渲染特效文字
+      document.querySelectorAll('.blur-text-container').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        renderBlurText(el, i18nData[currentLang][key] || el.innerHTML);
+      });
+
+      // 滚动交叉观察器 (Fade up)
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target); 
+          }
+        });
+      }, { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+
+      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>
